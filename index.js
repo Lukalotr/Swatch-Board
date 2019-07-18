@@ -12,6 +12,7 @@ var targets_underscore = []; // Array of target names formatted with underscores
 var targets_dash = []; // Array of target names formatted with dashes
 var targets_none = []; // Array of target names formatted with nothing ""
 var source_files = []; // Array of files in the source_files folder
+var matched = [];
 
 // Output related variables
 var matches = 0; // Records matches
@@ -26,9 +27,9 @@ console.log(`\x1b[37mSwatch-Board \x1b[90mAll Rights Reserved © 2019 Lukalot (L
 
 // Create the underscore, dash, and empty variants of our target names and complete them with the supplied suffix.
 for(i in targets_raw) {
-  targets_underscore.push((targets_raw[i].split(" ").join("_")).toLowerCase());
-  targets_dash.push((targets_raw[i].split(" ").join("-")).toLowerCase());
-  targets_none.push((targets_raw[i].split(" ").join("")).toLowerCase());
+  targets_underscore.push((targets_raw[i].split(" ").join("_")).toLowerCase().split("'").join(""));
+  targets_dash.push((targets_raw[i].split(" ").join("-")).toLowerCase().split("'").join(""));
+  targets_none.push((targets_raw[i].split(" ").join("")).toLowerCase().split("'").join(""));
 }
 
 // Compare the source with the targets in every possible combination.
@@ -37,6 +38,7 @@ for(i in source_files) {
     if (source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_underscore[j]) && source_files[i].replace(/[0-9]+/g, "").endsWith(suf) || source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_dash[j]) && source_files[i].replace(/[0-9]+/g, "").endsWith(suf) || source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_none[j]) && source_files[i].replace(/[0-9]+/g, "").endsWith(suf)) {
       // Copy the file as a match
       fs.copyFileSync("source_files/" + source_files[i], "output_files/" + source_files[i])
+      matched.push(targets_raw[j])
       matches ++; // Record the match
       var bottle_to_filename_pct = Math.round((targets_raw[j].length + suf.length)/(source_files[i].length)*100)
       if (log) {
@@ -50,4 +52,17 @@ for(i in source_files) {
   }
 }
 
+// Now get forget all of the ones we found so we can know which we didnt find. (all - matched = unmatched)
+for (i in matched) {
+  for(j in targets_raw) {
+    if (matched[i] === targets_raw[j]) {
+      targets_raw.splice(j, 1);
+    }
+  }
+}
+
+// Log disparate files
+fs.writeFileSync("disparate_log.txt",  `DISPARATE LOG - "Logging $%&#ed up stuff since 2019"\nRecorded ${targets_raw.length} unmatched targets in last process:\n\n` + targets_raw.join("\n") )
+
+// Complete
 console.log(`\x1b[32m --> Completed process with ${matches} match` + es(matches) + "\x1b[0m")

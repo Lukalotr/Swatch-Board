@@ -1,16 +1,14 @@
 # SWATCH-BOARD
 
-Swatch-Board is an automated file search program for searching and matching bulk swatch color images to nail polish bottle names. It can be used and modified for other purposes.
+Swatch-Board is an automated file search program designed by Lukalot for searching and matching bulk swatch color images to nail polish bottle names. It can be used and modified for other purposes.
 
 Swatch board finds and copies files that include specific phrases in their names to a new file.
 
 # Use
-If you want to use this program, this section might be important. Like, seriously, just read it.
-
 Use like:
 `node path/to/directory/index.js [suffix] [log] [warn]`
 
- - `[suffix]` String, defualt "". Filters only files that end with supplied string. `""` for no suffix.
+ - `[suffix]` String, defualt "". Filters only files that end with this. `""` for no suffix.
  - `[log]` Bool, defualt true. Determines wether or not the process will log individual matches in the console.
  - `[warn]` Number, defualt 20. Matches below this target:filename percentage will be marked yellow when logged to the console to indicate they *might* require some attention.
 
