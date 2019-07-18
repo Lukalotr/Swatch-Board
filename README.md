@@ -1,6 +1,6 @@
 # SWATCH-BOARD
 
-Swatch-Board is an automated file search program designed by Lukalot for searching and matching bulk swatch color images to nail polish bottle names. It can be used and modified for other purposes.
+Swatch-Board is an automated file search program for searching and matching bulk swatch color images to nail polish bottle names. It can be used and modified for other purposes.
 
 Swatch board finds and copies files that include specific phrases in their names to a new file.
 
