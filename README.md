@@ -8,7 +8,7 @@ Swatch board finds and copies files that include specific phrases in their names
 Use like:
 `node path/to/directory/index.js [suffix] [log] [warn]`
 
- - `[suffix]` String, defualt "". Filters only files that end with this. `""` for no suffix.
+ - `[suffix]` String, defualt "". Filters only files that end with supplied string. `""` for no suffix.
  - `[log]` Bool, defualt true. Determines wether or not the process will log individual matches in the console.
  - `[warn]` Number, defualt 20. Matches below this target:filename percentage will be marked yellow when logged to the console to indicate they *might* require some attention.
 
