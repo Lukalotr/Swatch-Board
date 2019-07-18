@@ -1,0 +1,16 @@
+{
+  "name": "swatch-board",
+  "version": "1.0.0",
+  "description": "Bulk file search",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js <names.txt> <prefix> <suffix>"
+  },
+  "author": "Lukalot",
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^8.1.0",
+    "minimist": "^1.2.0",
+    "minimist-options": "^4.0.1"
+  }
+}
