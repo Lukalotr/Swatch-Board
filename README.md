@@ -5,6 +5,8 @@ Swatch-Board is an automated file search program for searching and matching bulk
 Swatch board finds and copies files that include specific phrases in their names to a new file.
 
 # Use
+If you want to use this program, this section might be important. Like, seriously, just read it.
+
 Use like:
 `node path/to/directory/index.js [suffix] [log] [warn]`
 
