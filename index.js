@@ -8,7 +8,7 @@ console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arn
 (function checkExistingOutputOverwrite() {
   const outputFiles = fs.readdirSync('output_files/')
   // unfortunately, Node.js does not provide a way to automatically filter out hidden system files :(
-    .filter((filename) => filename !== 'desktop.ini' && filename !== 'Thumbs.db');
+    .filter((filename) => filename !== 'desktop.ini' && filename !== 'Thumbs.db' && filename.substr(0, 1) !== '.');
 
   if (outputFiles.length > 0) {
     console.warn('\x1b[33mWARNING: ' + outputFiles.length + ' files were already in the output folder, and have not been removed.\x1b[0m');
@@ -20,12 +20,9 @@ const suffix = process.argv[2] || '';
 const isLoggingEnabled = process.argv[3] || true;
 const threshold = process.argv[4] || 20;
 
-// Get data
-var source_files = fs.readdirSync('source_files/'); // Array of files in the source_files folder
-
 const targets = [];
 
-(async function processLineByLine() {
+async function readTargets() {
   try {
     const rl = readline.createInterface({
       input: fs.createReadStream('targets.txt'),
@@ -46,10 +43,12 @@ const targets = [];
     });
 
     await once(rl, 'close');
+    return targets;
   } catch (err) {
-    console.error('Failed to process targets.txt:', err);
+    console.error('Failed to process targets.txt:');
+    throw err;
   }
-})();
+}
 
 function checkNameMatch(sourceName, target) {
   const noDigitsName = sourceName.replace(/[0-9]+/g, '');
@@ -65,32 +64,43 @@ function checkNameMatch(sourceName, target) {
     || noDigitsLowercaseName.includes(target.none));
 }
 
-const matched = [];
+function compareTargetsWithSources(targets) {
+  const source_files = fs.readdirSync('source_files/'); // Array of files in the source_files folder
+  const matched = [];
 
-// Compare the source with the targets in every possible combination.
-for (let i = 0; i < source_files.length; i++) {
-  for (let j = 0; j < targets.length; j++) {
-    if (checkNameMatch(source_files[i], targets[j])) {
-      fs.copyFileSync('source_files/' + source_files[i], 'output_files/' + source_files[i]);
-      matched.push(targets[j].raw);
+  for (let i = 0; i < source_files.length; i++) {
+    for (let j = 0; j < targets.length; j++) {
+      if (checkNameMatch(source_files[i], targets[j])) {
+        fs.copyFileSync('source_files/' + source_files[i], 'output_files/' + source_files[i]);
+        matched.push(targets[j].raw);
 
-      if (isLoggingEnabled) {
-        const nameMatchPercentage = Math.round((targets[j].raw.length + suffix.length) / (source_files[i].length) * 100);
+        if (isLoggingEnabled) {
+          const nameMatchPercentage = Math.round((targets[j].raw.length + suffix.length) / (source_files[i].length) * 100);
 
-        if (nameMatchPercentage < threshold) {
-          console.log('  \x1b[33m[' + nameMatchPercentage + '%]\x1b[0m MATCH - ' + source_files[i] + ' / ' + targets[j].raw);
-        } else {
-          console.log('  [' + nameMatchPercentage + '%] MATCH - ' + source_files[i] + ' / ' + targets[j].raw);
+          if (nameMatchPercentage < threshold) {
+            console.log('  \x1b[33m[' + nameMatchPercentage + '%]\x1b[0m MATCH - ' + source_files[i] + ' / ' + targets[j].raw);
+          } else {
+            console.log('  [' + nameMatchPercentage + '%] MATCH - ' + source_files[i] + ' / ' + targets[j].raw);
+          }
         }
       }
     }
   }
+
+  return [targets, matched];
 }
 
-const targetsNotMatched = targets.filter((target) => !matched.includes(target.raw));
+function showResults(results) {
+  const [targets, matched] = results;
+  const targetsNotMatched = targets.filter((target) => !matched.includes(target.raw));
 
-// Log disparate files
-fs.writeFileSync('disparate_log.log', `DISPARATE LOG - 'Logging $%&#ed up stuff since 2019'
+  fs.writeFileSync('disparate_log.log', `DISPARATE LOG - 'Logging $%&#ed up stuff since 2019'
   Recorded ${targetsNotMatched.length} unmatched targets in last process:\n\n` + targetsNotMatched.map(t => t.raw).join("\n"));
 
-console.log(`\x1b[32m --> Completed process with ${matched.length} match${(matched.length === 1) ? '' : 'es'}\x1b[0m`);
+  console.log(`\x1b[32m --> Completed process with ${matched.length} match${(matched.length === 1) ? '' : 'es'}\x1b[0m`);
+}
+
+readTargets()
+  .then(compareTargetsWithSources)
+  .then(showResults)
+  .catch(err => console.error(err));
