@@ -74,8 +74,8 @@ for (i in matched) {
 }
 
 // Log disparate files
-fs.writeFileSync("disparate_log.txt",  `DISPARATE LOG - "Logging $%&#ed up stuff since 2019"
-  Recorded ${targets_raw.length} unmatched targets in last process:\n\n` + targets_raw.join("\n") )
+fs.writeFileSync("disparate_log.log",  `DISPARATE LOG - "Logging $%&#ed up stuff since 2019"
+  Recorded ${targets_raw.length} unmatched targets in last process:\n\n` + targets_raw.join("\n"));
 
 // Complete
 console.log(`\x1b[32m --> Completed process with ${matches} match` + es(matches) + "\x1b[0m")
