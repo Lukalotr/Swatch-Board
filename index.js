@@ -1,4 +1,6 @@
 const fs = require('fs');
+const readline = require('readline');
+const {once} = require('events');
 
 console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arnold) All Rights Reserved
 \x1b[32m --> Starting process...\x1b[0m`);
@@ -20,23 +22,36 @@ const threshold = process.argv[4] || 20;
 
 // Get data
 var source_files = fs.readdirSync('source_files/'); // Array of files in the source_files folder
-var targets_raw = fs.readFileSync('targets.txt').toString().split("\r\n") // Array of names in the targets.txt file
-  .filter(line => !!line); // Remove empty lines
-var targets_underscore = []; // Array of target names formatted with underscores
-var targets_dash = []; // Array of target names formatted with dashes
-var targets_none = []; // Array of target names formatted with nothing ""
-var matched = [];
 
-// Create the underscore, dash, and empty variants of our target names and complete them with the supplied suffix.
-for (let i = 0; i < targets_raw.length; i++) {
-  const no_quotes = targets_raw[i].toLowerCase().split("'").join("");
+const targets = [];
 
-  targets_underscore.push(no_quotes.split(" ").join("_"));
-  targets_dash.push(no_quotes.split(" ").join("-"));
-  targets_none.push(no_quotes.split(" ").join(""));
-}
+(async function processLineByLine() {
+  try {
+    const rl = readline.createInterface({
+      input: fs.createReadStream('targets.txt'),
+      crlfDelay: Infinity
+    });
 
-function checkNameMatch(sourceName, targetIndex) {
+    rl.on('line', (line) => {
+      if (line.trim() !== '') {
+        const no_quotes = line.toLowerCase().split("'").join("");
+
+        targets.push({
+          raw: line,
+          underscore: no_quotes.split(' ').join('_'),
+          dash: no_quotes.split(' ').join('-'),
+          none: no_quotes.split(' ').join('')
+        });
+      }
+    });
+
+    await once(rl, 'close');
+  } catch (err) {
+    console.error('Failed to process targets.txt:', err);
+  }
+})();
+
+function checkNameMatch(sourceName, target) {
   const noDigitsName = sourceName.replace(/[0-9]+/g, '');
 
   if (suffix && !noDigitsName.endsWith(suffix)) {
@@ -45,42 +60,37 @@ function checkNameMatch(sourceName, targetIndex) {
 
   const noDigitsLowercaseName = noDigitsName.toLowerCase();
 
-  return (noDigitsLowercaseName.includes(targets_underscore[targetIndex])
-    || noDigitsLowercaseName.includes(targets_dash[targetIndex])
-    || noDigitsLowercaseName.includes(targets_none[targetIndex]));
+  return (noDigitsLowercaseName.includes(target.underscore)
+    || noDigitsLowercaseName.includes(target.dash)
+    || noDigitsLowercaseName.includes(target.none));
 }
 
+const matched = [];
+
 // Compare the source with the targets in every possible combination.
-for (i = 0; i < source_files.length; i++) {
-  for(j in targets_raw) {
-    if (checkNameMatch(source_files[i], j)) {
-      // Copy the file as a match
-      fs.copyFileSync("source_files/" + source_files[i], "output_files/" + source_files[i]);
-      matched.push(targets_raw[j]);
+for (let i = 0; i < source_files.length; i++) {
+  for (let j = 0; j < targets.length; j++) {
+    if (checkNameMatch(source_files[i], targets[j])) {
+      fs.copyFileSync('source_files/' + source_files[i], 'output_files/' + source_files[i]);
+      matched.push(targets[j].raw);
 
       if (isLoggingEnabled) {
-        var bottle_to_filename_pct = Math.round((targets_raw[j].length + suffix.length)/(source_files[i].length)*100);
-        if (bottle_to_filename_pct < threshold) {
-          console.log( "  \x1b[33m[" + bottle_to_filename_pct + "%]\x1b[0m MATCH - " + source_files[i] + " / " + targets_raw[j])
+        const nameMatchPercentage = Math.round((targets[j].raw.length + suffix.length) / (source_files[i].length) * 100);
+
+        if (nameMatchPercentage < threshold) {
+          console.log('  \x1b[33m[' + nameMatchPercentage + '%]\x1b[0m MATCH - ' + source_files[i] + ' / ' + targets[j].raw);
         } else {
-          console.log( "  [" + bottle_to_filename_pct + "%] MATCH - " + source_files[i] + " / " + targets_raw[j])
+          console.log('  [' + nameMatchPercentage + '%] MATCH - ' + source_files[i] + ' / ' + targets[j].raw);
         }
       }
     }
   }
 }
 
-// Now get forget all of the ones we found so we can know which we didnt find. (all - matched = unmatched)
-for (i in matched) {
-  for(j in targets_raw) {
-    if (matched[i] === targets_raw[j]) {
-      targets_raw.splice(j, 1);
-    }
-  }
-}
+const targetsNotMatched = targets.filter((target) => !matched.includes(target.raw));
 
 // Log disparate files
-fs.writeFileSync("disparate_log.log",  `DISPARATE LOG - "Logging $%&#ed up stuff since 2019"
-  Recorded ${targets_raw.length} unmatched targets in last process:\n\n` + targets_raw.join("\n"));
+fs.writeFileSync('disparate_log.log', `DISPARATE LOG - 'Logging $%&#ed up stuff since 2019'
+  Recorded ${targetsNotMatched.length} unmatched targets in last process:\n\n` + targetsNotMatched.map(t => t.raw).join("\n"));
 
 console.log(`\x1b[32m --> Completed process with ${matched.length} match${(matched.length === 1) ? '' : 'es'}\x1b[0m`);
