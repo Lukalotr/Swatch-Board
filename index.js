@@ -14,26 +14,21 @@ console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arn
 })();
 
 // Get arguments
-var suf = process.argv[2] || '';
-var log = process.argv[3] || true;
-var threshold = process.argv[4] || 20;
+const suffix = process.argv[2] || '';
+const isLoggingEnabled = process.argv[3] || true;
+const threshold = process.argv[4] || 20;
 
 // Get data
-var targets_raw = fs.readFileSync('targets.txt').toString().split("\r\n"); // Array of names in the targets.txt file
+var source_files = fs.readdirSync('source_files/'); // Array of files in the source_files folder
+var targets_raw = fs.readFileSync('targets.txt').toString().split("\r\n") // Array of names in the targets.txt file
+  .filter(line => !!line); // Remove empty lines
 var targets_underscore = []; // Array of target names formatted with underscores
 var targets_dash = []; // Array of target names formatted with dashes
 var targets_none = []; // Array of target names formatted with nothing ""
-var source_files = []; // Array of files in the source_files folder
 var matched = [];
 
-// Output related
-var matches = 0; // Records matches
-
-targets_raw = targets_raw.filter(n => n); // Remove empty array elements
-source_files = fs.readdirSync("source_files/"); // Get source files
-
 // Create the underscore, dash, and empty variants of our target names and complete them with the supplied suffix.
-for (i = 0; i < targets_raw.length; i++) {
+for (let i = 0; i < targets_raw.length; i++) {
   const no_quotes = targets_raw[i].toLowerCase().split("'").join("");
 
   targets_underscore.push(no_quotes.split(" ").join("_"));
@@ -41,19 +36,30 @@ for (i = 0; i < targets_raw.length; i++) {
   targets_none.push(no_quotes.split(" ").join(""));
 }
 
+function checkNameMatch(sourceName, targetIndex) {
+  const noDigitsName = sourceName.replace(/[0-9]+/g, '');
+
+  if (suffix && !noDigitsName.endsWith(suffix)) {
+    return false;
+  }
+
+  const noDigitsLowercaseName = noDigitsName.toLowerCase();
+
+  return (noDigitsLowercaseName.includes(targets_underscore[targetIndex])
+    || noDigitsLowercaseName.includes(targets_dash[targetIndex])
+    || noDigitsLowercaseName.includes(targets_none[targetIndex]));
+}
+
 // Compare the source with the targets in every possible combination.
 for (i = 0; i < source_files.length; i++) {
   for(j in targets_raw) {
-
-    if (source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_underscore[j]) && source_files[i].replace(/[0-9]+/g, "").endsWith(suf)
-    ||  source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_dash[j])       && source_files[i].replace(/[0-9]+/g, "").endsWith(suf)
-    ||  source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_none[j])       && source_files[i].replace(/[0-9]+/g, "").endsWith(suf)) {
+    if (checkNameMatch(source_files[i], j)) {
       // Copy the file as a match
       fs.copyFileSync("source_files/" + source_files[i], "output_files/" + source_files[i]);
       matched.push(targets_raw[j]);
-      matches ++; // Record the match
-      var bottle_to_filename_pct = Math.round((targets_raw[j].length + suf.length)/(source_files[i].length)*100);
-      if (log) {
+
+      if (isLoggingEnabled) {
+        var bottle_to_filename_pct = Math.round((targets_raw[j].length + suffix.length)/(source_files[i].length)*100);
         if (bottle_to_filename_pct < threshold) {
           console.log( "  \x1b[33m[" + bottle_to_filename_pct + "%]\x1b[0m MATCH - " + source_files[i] + " / " + targets_raw[j])
         } else {
@@ -61,7 +67,6 @@ for (i = 0; i < source_files.length; i++) {
         }
       }
     }
-
   }
 }
 
@@ -78,4 +83,4 @@ for (i in matched) {
 fs.writeFileSync("disparate_log.log",  `DISPARATE LOG - "Logging $%&#ed up stuff since 2019"
   Recorded ${targets_raw.length} unmatched targets in last process:\n\n` + targets_raw.join("\n"));
 
-console.log(`\x1b[32m --> Completed process with ${matches} match${(matches === 1) ? '' : 'es'}\x1b[0m`);
+console.log(`\x1b[32m --> Completed process with ${matched.length} match${(matched.length === 1) ? '' : 'es'}\x1b[0m`);
