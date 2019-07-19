@@ -14,7 +14,7 @@ console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arn
 })();
 
 // Get arguments
-var suf = process.argv[2];
+var suf = process.argv[2] || '';
 var log = process.argv[3] || true;
 var threshhold = process.argv[4] || 20;
 
