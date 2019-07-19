@@ -1,5 +1,4 @@
-
-const fs = require('fs-extra')
+const fs = require('fs-extra');
 
 // Get arguments
 var suf = process.argv[2];
@@ -17,22 +16,21 @@ var matched = [];
 // Output related
 var matches = 0; // Records matches
 var mwarn = function() { // Warn when mixing output files with old output files
-  if ( fs.readdirSync("output_files/")[0] != "desktop.ini" && fs.readdirSync("output_files/")[0] != undefined || fs.readdirSync("output_files/").length > 1 ) {
+  if ( fs.readdirSync("output_files/")[0] !== "desktop.ini" && fs.readdirSync("output_files/")[0] !== undefined || fs.readdirSync("output_files/").length > 1 ) {
     return "| \x1b[33mWARNING: " + fs.readdirSync("output_files/").filter(function(e) { return e !== 'desktop.ini' }).length + " files were already in the output folder, and have not been removed.\x1b[0m"
   } else { return "" }
-}
-var es = function(m) { if ( m != 1 ) { return "es" } else { return "" } } // Grammatically correct plural in console.log
-var bottle_to_filename_pct;
+};
+var es = function(m) { if ( m !== 1 ) { return "es" } else { return "" } }; // Grammatically correct plural in console.log
 
-targets_raw = targets_raw.filter(n => n) // Remove empty array elements
+targets_raw = targets_raw.filter(n => n); // Remove empty array elements
 
-source_files = fs.readdirSync("source_files/") // Get source files
+source_files = fs.readdirSync("source_files/"); // Get source files
 
 console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arnold) All Rights Reserved
-\x1b[32m --> Starting process \x1b[0m` + mwarn())
+  \x1b[32m --> Starting process \x1b[0m` + mwarn());
 
 // Create the underscore, dash, and empty variants of our target names and complete them with the supplied suffix.
-for(i in targets_raw) {
+for (i = 0; i < targets_raw.length; i++) {
   const no_quotes = targets_raw[i].toLowerCase().split("'").join("");
 
   targets_underscore.push(no_quotes.split(" ").join("_"));
@@ -41,17 +39,17 @@ for(i in targets_raw) {
 }
 
 // Compare the source with the targets in every possible combination.
-for(i in source_files) {
+for (i = 0; i < source_files.length; i++) {
   for(j in targets_raw) {
 
     if (source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_underscore[j]) && source_files[i].replace(/[0-9]+/g, "").endsWith(suf)
     ||  source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_dash[j])       && source_files[i].replace(/[0-9]+/g, "").endsWith(suf)
     ||  source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_none[j])       && source_files[i].replace(/[0-9]+/g, "").endsWith(suf)) {
       // Copy the file as a match
-      fs.copyFileSync("source_files/" + source_files[i], "output_files/" + source_files[i])
-      matched.push(targets_raw[j])
+      fs.copyFileSync("source_files/" + source_files[i], "output_files/" + source_files[i]);
+      matched.push(targets_raw[j]);
       matches ++; // Record the match
-      var bottle_to_filename_pct = Math.round((targets_raw[j].length + suf.length)/(source_files[i].length)*100)
+      var bottle_to_filename_pct = Math.round((targets_raw[j].length + suf.length)/(source_files[i].length)*100);
       if (log) {
         if (bottle_to_filename_pct < threshhold) {
           console.log( "  \x1b[33m[" + bottle_to_filename_pct + "%]\x1b[0m MATCH - " + source_files[i] + " / " + targets_raw[j])
@@ -78,4 +76,4 @@ fs.writeFileSync("disparate_log.log",  `DISPARATE LOG - "Logging $%&#ed up stuff
   Recorded ${targets_raw.length} unmatched targets in last process:\n\n` + targets_raw.join("\n"));
 
 // Complete
-console.log(`\x1b[32m --> Completed process with ${matches} match` + es(matches) + "\x1b[0m")
+console.log(`\x1b[32m --> Completed process with ${matches} match` + es(matches) + "\x1b[0m");
