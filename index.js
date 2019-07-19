@@ -1,4 +1,4 @@
-const fs = require('fs-extra');
+const fs = require('fs');
 
 // Get arguments
 var suf = process.argv[2];
