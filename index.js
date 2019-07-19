@@ -94,7 +94,7 @@ function showResults(results) {
   const [targets, matched] = results;
   const targetsNotMatched = targets.filter((target) => !matched.includes(target.raw));
 
-  fs.writeFileSync('disparate_log.log', `DISPARATE LOG - 'Logging $%&#ed up stuff since 2019'
+  fs.writeFileSync('disparate_targets.log', `DISPARATE LOG - 'Logging $%&#ed up stuff since 2019'
   Recorded ${targetsNotMatched.length} unmatched targets in last process:\n\n` + targetsNotMatched.map(t => t.raw).join("\n"));
 
   console.log(`\x1b[32m --> Completed process with ${matched.length} match${(matched.length === 1) ? '' : 'es'}\x1b[0m`);
