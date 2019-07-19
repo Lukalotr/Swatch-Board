@@ -14,28 +14,38 @@ var targets_none = []; // Array of target names formatted with nothing ""
 var source_files = []; // Array of files in the source_files folder
 var matched = [];
 
-// Output related variables
+// Output related
 var matches = 0; // Records matches
-var mwarn = function() { if ( fs.readdirSync("output_files/")[0] != "desktop.ini" && fs.readdirSync("output_files/")[0] != undefined || fs.readdirSync("output_files/").length > 1 ) { return "| \x1b[33mWARNING: " + fs.readdirSync("output_files/").filter(function(e) { return e !== 'desktop.ini' }).length + " files were already in the output folder, and have not been removed.\x1b[0m" } else { return "" } }
+var mwarn = function() { // Warn when mixing output files with old output files
+  if ( fs.readdirSync("output_files/")[0] != "desktop.ini" && fs.readdirSync("output_files/")[0] != undefined || fs.readdirSync("output_files/").length > 1 ) {
+    return "| \x1b[33mWARNING: " + fs.readdirSync("output_files/").filter(function(e) { return e !== 'desktop.ini' }).length + " files were already in the output folder, and have not been removed.\x1b[0m"
+  } else { return "" }
+}
 var es = function(m) { if ( m != 1 ) { return "es" } else { return "" } } // Grammatically correct plural in console.log
 var bottle_to_filename_pct;
+
 targets_raw = targets_raw.filter(n => n) // Remove empty array elements
 
 source_files = fs.readdirSync("source_files/") // Get source files
 
-console.log(`\x1b[37mSwatch-Board \x1b[90mAll Rights Reserved © 2019 Lukalot (Luke N. Arnold)\n\x1b[32m --> Starting process \x1b[0m` + mwarn())
+console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arnold) All Rights Reserved\n\x1b[32m --> Starting process \x1b[0m` + mwarn())
 
 // Create the underscore, dash, and empty variants of our target names and complete them with the supplied suffix.
 for(i in targets_raw) {
-  targets_underscore.push((targets_raw[i].split(" ").join("_")).toLowerCase().split("'").join(""));
-  targets_dash.push((targets_raw[i].split(" ").join("-")).toLowerCase().split("'").join(""));
-  targets_none.push((targets_raw[i].split(" ").join("")).toLowerCase().split("'").join(""));
+  const no_quotes = targets_raw[i].toLowerCase().split("'").join("");
+
+  targets_underscore.push(no_quotes.split(" ").join("_"));
+  targets_dash.push(no_quotes.split(" ").join("-"));
+  targets_none.push(no_quotes.split(" ").join(""));
 }
 
 // Compare the source with the targets in every possible combination.
 for(i in source_files) {
   for(j in targets_raw) {
-    if (source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_underscore[j]) && source_files[i].replace(/[0-9]+/g, "").endsWith(suf) || source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_dash[j]) && source_files[i].replace(/[0-9]+/g, "").endsWith(suf) || source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_none[j]) && source_files[i].replace(/[0-9]+/g, "").endsWith(suf)) {
+
+    if (source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_underscore[j]) && source_files[i].replace(/[0-9]+/g, "").endsWith(suf)
+    ||  source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_dash[j])       && source_files[i].replace(/[0-9]+/g, "").endsWith(suf)
+    ||  source_files[i].replace(/[0-9]+/g, "").toLowerCase().includes(targets_none[j])       && source_files[i].replace(/[0-9]+/g, "").endsWith(suf)) {
       // Copy the file as a match
       fs.copyFileSync("source_files/" + source_files[i], "output_files/" + source_files[i])
       matched.push(targets_raw[j])
@@ -49,6 +59,7 @@ for(i in source_files) {
         }
       }
     }
+
   }
 }
 
