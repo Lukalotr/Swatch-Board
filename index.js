@@ -16,7 +16,7 @@ console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arn
 // Get arguments
 var suf = process.argv[2] || '';
 var log = process.argv[3] || true;
-var threshhold = process.argv[4] || 20;
+var threshold = process.argv[4] || 20;
 
 // Get data
 var targets_raw = fs.readFileSync('targets.txt').toString().split("\r\n"); // Array of names in the targets.txt file
@@ -54,7 +54,7 @@ for (i = 0; i < source_files.length; i++) {
       matches ++; // Record the match
       var bottle_to_filename_pct = Math.round((targets_raw[j].length + suf.length)/(source_files[i].length)*100);
       if (log) {
-        if (bottle_to_filename_pct < threshhold) {
+        if (bottle_to_filename_pct < threshold) {
           console.log( "  \x1b[33m[" + bottle_to_filename_pct + "%]\x1b[0m MATCH - " + source_files[i] + " / " + targets_raw[j])
         } else {
           console.log( "  [" + bottle_to_filename_pct + "%] MATCH - " + source_files[i] + " / " + targets_raw[j])
