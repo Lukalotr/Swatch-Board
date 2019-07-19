@@ -1,5 +1,18 @@
 const fs = require('fs');
 
+console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arnold) All Rights Reserved
+\x1b[32m --> Starting process...\x1b[0m`);
+
+(function checkExistingOutputOverwrite() {
+  const outputFiles = fs.readdirSync('output_files/')
+  // unfortunately, Node.js does not provide a way to automatically filter out hidden system files :(
+    .filter((filename) => filename !== 'desktop.ini' && filename !== 'Thumbs.db');
+
+  if (outputFiles.length > 0) {
+    console.warn('\x1b[33mWARNING: ' + outputFiles.length + ' files were already in the output folder, and have not been removed.\x1b[0m');
+  }
+})();
+
 // Get arguments
 var suf = process.argv[2];
 var log = process.argv[3] || true;
@@ -15,19 +28,9 @@ var matched = [];
 
 // Output related
 var matches = 0; // Records matches
-var mwarn = function() { // Warn when mixing output files with old output files
-  if ( fs.readdirSync("output_files/")[0] !== "desktop.ini" && fs.readdirSync("output_files/")[0] !== undefined || fs.readdirSync("output_files/").length > 1 ) {
-    return "| \x1b[33mWARNING: " + fs.readdirSync("output_files/").filter(function(e) { return e !== 'desktop.ini' }).length + " files were already in the output folder, and have not been removed.\x1b[0m"
-  } else { return "" }
-};
-var es = function(m) { if ( m !== 1 ) { return "es" } else { return "" } }; // Grammatically correct plural in console.log
 
 targets_raw = targets_raw.filter(n => n); // Remove empty array elements
-
 source_files = fs.readdirSync("source_files/"); // Get source files
-
-console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arnold) All Rights Reserved
-  \x1b[32m --> Starting process \x1b[0m` + mwarn());
 
 // Create the underscore, dash, and empty variants of our target names and complete them with the supplied suffix.
 for (i = 0; i < targets_raw.length; i++) {
@@ -75,5 +78,4 @@ for (i in matched) {
 fs.writeFileSync("disparate_log.log",  `DISPARATE LOG - "Logging $%&#ed up stuff since 2019"
   Recorded ${targets_raw.length} unmatched targets in last process:\n\n` + targets_raw.join("\n"));
 
-// Complete
-console.log(`\x1b[32m --> Completed process with ${matches} match` + es(matches) + "\x1b[0m");
+console.log(`\x1b[32m --> Completed process with ${matches} match${(matches === 1) ? '' : 'es'}\x1b[0m`);
