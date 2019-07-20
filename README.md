@@ -17,7 +17,7 @@ If this requirement is met, run `npm install` in the root directory.
     bar baz
     ```
     
-    will find files with names like `FoO-bAr.jpg`, `_BAR_baz.png` and `Bar-0_Baz.gif`,
+    will find files with names like `FoO-bAr.jpg`, `_BAR_baz.png` and `Bar0_Baz.gif`,
     but will not match names like `bar.bmp`.
 
 2. Put the files to be filtered inside the directory named `source_files`.
