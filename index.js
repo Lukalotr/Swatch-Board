@@ -1,6 +1,8 @@
 const fs = require('fs');
 const readline = require('readline');
 const {once} = require('events');
+const hidefile = require('hidefile');
+const junk = require('junk');
 
 console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arnold) All Rights Reserved
 \x1b[32m --> Starting process...\x1b[0m`);
@@ -8,7 +10,7 @@ console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arn
 (function checkExistingOutputOverwrite() {
   const outputFiles = fs.readdirSync('output_files/')
   // unfortunately, Node.js does not provide a way to automatically filter out hidden system files :(
-    .filter((filename) => filename !== 'desktop.ini' && filename !== 'Thumbs.db' && filename.substr(0, 1) !== '.');
+    .filter((filename) => junk.not(filename) || isHiddenSync(filename));
 
   if (outputFiles.length > 0) {
     console.warn('\x1b[33mWARNING: ' + outputFiles.length + ' files were already in the output folder, and have not been removed.\x1b[0m');
