@@ -1,10 +1,10 @@
-# SWATCH-BOARD
+# Bulk File Filter
 
-Swatch-Board is a script for bulk file filtering *by name*.
+Bulk File Filter is a script for bulk file filtering *by name*.
 
 ## Installation
 
-Swatch-Board requires [Node.js](https://nodejs.org/) to run.
+Bulk File Filter requires [Node.js](https://nodejs.org/) to run.
 If this requirement is met, run `npm install` in the root directory.
 
 ## Usage
