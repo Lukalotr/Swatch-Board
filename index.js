@@ -4,7 +4,7 @@ const {once} = require('events');
 const hidefile = require('hidefile');
 const junk = require('junk');
 
-console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arnold) All Rights Reserved
+console.log(`\x1b[37mBulk File Filter \x1b[90mCopyright © 2019 Lukalot (Luke N. Arnold) All Rights Reserved
 \x1b[32m --> Starting process...\x1b[0m`);
 
 (function checkExistingOutputOverwrite() {
