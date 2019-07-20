@@ -1,6 +1,6 @@
 # Bulk File Filter
 
-Bulk File Filter is a script for bulk file filtering *by name*.
+Bulk File Filter is a script for file filtering *by name*.
 
 ## Installation
 
