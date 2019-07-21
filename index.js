@@ -24,8 +24,6 @@ let args = minimist(process.argv.slice(2), {
     }
 });
 
-console.log(args);
-
 console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arnold) All Rights Reserved
 \x1b[32m --> Starting process...\x1b[0m`);
 
