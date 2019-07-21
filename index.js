@@ -32,7 +32,30 @@ console.log(`\x1b[37mBulk File Filter \x1b[90mCopyright © 2019 Lukalot (Luke N.
     .filter((filename) => junk.not(filename) && !filename.startsWith('.'));
 
   if (outputFiles.length > 0) {
-    console.warn('\x1b[33mWARNING: ' + outputFiles.length + ' files were already in the output folder, and have not been removed.\x1b[0m');
+    console.warn('\x1b[33mWARNING: Output directory is not empty! Continuing may result in files being overwritten.\x1b[0m');
+
+    const readlineSync = require('readline-sync');
+    const askForDecision = function () {
+      const char = readlineSync.keyIn('Press Y to continue as-is, C to clear output folder and continue, or N to abort: ').toLowerCase();
+
+      if (char === 'n') {
+        process.exit();
+      } else if (char === 'y') {
+        // do nothing here, just continue execution
+      } else if (char === 'c') {
+        console.log('Clearing output directory...');
+
+        for (const file of outputFiles) {
+          fs.unlinkSync('output_files/' + file);
+        }
+
+        console.log('Output directory cleared.');
+      } else {
+        askForDecision(); // invalid choice, ask again
+      }
+    };
+
+    askForDecision();
   }
 })();
 
