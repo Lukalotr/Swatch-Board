@@ -6,19 +6,21 @@ const junk = require('junk');
 const minimist = require('minimist');
 
 let args = minimist(process.argv.slice(2), {
+    string: ['p', 's'],
+    boolean: ['l'],
     alias: {
-        p: 'prefix',
-        pre: 'prefix',
-        s: 'suffix',
-        suf: 'suffix',
-        l: 'log',
-        w: 'warn'
+        prefix: 'p',
+        pre: 'p',
+        suffix: 's',
+        suf: 's',
+        log: 'l',
+        warn: 'w'
     },
     default: {
-        prefix: '',
-        suffix: '',
-        log: true,
-        warn: 20,
+        p: '',
+        s: '',
+        l: false,
+        w: 20,
     }
 });
 
@@ -38,9 +40,10 @@ console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arn
 })();
 
 // Get arguments
-const suffix = process.argv[2] || '';
-const isLoggingEnabled = process.argv[3] || true;
-const threshold = process.argv[4] || 20;
+const prefix = args.p;
+const suffix = args.s;
+const isLoggingEnabled = args.l;
+const threshold = args.w;
 
 const targets = [];
 
