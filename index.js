@@ -3,6 +3,26 @@ const readline = require('readline');
 const {once} = require('events');
 const hidefile = require('hidefile');
 const junk = require('junk');
+const minimist = require('minimist');
+
+let args = minimist(process.argv.slice(2), {
+    alias: {
+        p: 'prefix',
+        pre: 'prefix',
+        s: 'suffix',
+        suf: 'suffix',
+        l: 'log',
+        w: 'warn'
+    },
+    default: {
+        prefix: '',
+        suffix: '',
+        log: true,
+        warn: 20,
+    }
+});
+
+console.log(args);
 
 console.log(`\x1b[37mSwatch-Board \x1b[90mCopyright © 2019 Lukalot (Luke N. Arnold) All Rights Reserved
 \x1b[32m --> Starting process...\x1b[0m`);
