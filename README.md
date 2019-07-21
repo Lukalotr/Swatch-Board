@@ -27,10 +27,10 @@ If this requirement is met, run `npm install` in the root directory.
     `node index.js [option] [option] ...`
 
 #### Options:
-     `-prefix=` String, default "". Tells the program to filter only files that start with this string. Alias: pre, p.
-     `-suffix=` String, default "". Tells the program to filter only files that end with this string, good for .ext situations. Alias: suf, s.
-     `-log=` Bool, default false. Whether or not the process will log individual matches in the console. Alias: l.
-     `-warn=` Number, default 20. Matches below this target:filename percentage will be marked yellow when logged to the console to indicate they *may* require some attention. Alias: w.
+- `-prefix=` String, default "". Tells the program to filter only files that start with this string. Alias: `pre`, `p`.
+- `-suffix=` String, default "". Tells the program to filter only files that end with this string, good for `.ext` situations. Alias: `suf`, `s`.
+- `-log=` Bool, default false. Whether or not the process will log individual matches in the console. Alias: `l`.
+- `-warn=` Number, default 20. Matches below this target:filename percentage will be marked yellow when logged to the console to indicate they *may* require some attention. Alias: `w`.
 
 After running the script, the files that matched the target keywords will be **copied** into the directory named `output_files`.
 
