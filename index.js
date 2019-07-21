@@ -1,7 +1,6 @@
 const fs = require('fs');
 const readline = require('readline');
 const {once} = require('events');
-const hidefile = require('hidefile');
 const junk = require('junk');
 const minimist = require('minimist');
 
@@ -30,7 +29,7 @@ console.log(`\x1b[37mBulk File Filter \x1b[90mCopyright © 2019 Lukalot (Luke N.
 (function checkExistingOutputOverwrite() {
   const outputFiles = fs.readdirSync('output_files/')
   // unfortunately, Node.js does not provide a way to automatically filter out hidden system files :(
-    .filter((filename) => junk.not(filename) || isHiddenSync(filename));
+    .filter((filename) => junk.not(filename) && !filename.startsWith('.'));
 
   if (outputFiles.length > 0) {
     console.warn('\x1b[33mWARNING: ' + outputFiles.length + ' files were already in the output folder, and have not been removed.\x1b[0m');
@@ -75,6 +74,10 @@ async function readTargets() {
 
 function checkNameMatch(sourceName, target) {
   const noDigitsName = sourceName.replace(/[0-9]+/g, '');
+
+  if (prefix && !noDigitsName.startsWith(prefix)) {
+    return false;
+  }
 
   if (suffix && !noDigitsName.endsWith(suffix)) {
     return false;
