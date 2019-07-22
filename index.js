@@ -2,25 +2,26 @@ const fs = require('fs');
 const readline = require('readline');
 const {once} = require('events');
 const junk = require('junk');
-const minimist = require('minimist');
 
-let args = minimist(process.argv.slice(2), {
-    string: ['p', 's'],
-    boolean: ['l'],
-    alias: {
-        prefix: 'p',
-        pre: 'p',
-        suffix: 's',
-        suf: 's',
-        log: 'l',
-        warn: 'w'
-    },
-    default: {
-        p: '',
-        s: '',
-        l: false,
-        w: 20,
-    }
+/** @property {string} args.prefix */
+/** @property {string} args.suffix */
+/** @property {boolean} args.log */
+/** @property {number} args.threshold */
+const args = require('minimist')(process.argv.slice(2), {
+  string: ['prefix', 'suffix'],
+  boolean: ['log'],
+  alias: {
+    p: 'prefix',
+    s: 'suffix',
+    l: 'log',
+    t: 'threshold'
+  },
+  default: {
+    prefix: '',
+    suffix: '',
+    log: false,
+    threshold: 20,
+  }
 });
 
 console.log(`\x1b[37mBulk File Filter \x1b[90mCopyright © 2019 Lukalot (Luke N. Arnold) All Rights Reserved
@@ -32,15 +33,32 @@ console.log(`\x1b[37mBulk File Filter \x1b[90mCopyright © 2019 Lukalot (Luke N.
     .filter((filename) => junk.not(filename) && !filename.startsWith('.'));
 
   if (outputFiles.length > 0) {
-    console.warn('\x1b[33mWARNING: ' + outputFiles.length + ' files were already in the output folder, and have not been removed.\x1b[0m');
+    console.warn('\x1b[33mWARNING: Output directory is not empty! Continuing may result in files being overwritten.\x1b[0m');
+
+    const readlineSync = require('readline-sync');
+    const askForDecision = function () {
+      const char = readlineSync.keyIn('Press Y to continue as-is, C to clear output folder and continue, or N to abort: ').toLowerCase();
+
+      if (char === 'n') {
+        process.exit();
+      } else if (char === 'y') {
+        // do nothing here, just continue execution
+      } else if (char === 'c') {
+        console.log('Clearing output directory...');
+
+        for (const file of outputFiles) {
+          fs.unlinkSync('output_files/' + file);
+        }
+
+        console.log('Output directory cleared.');
+      } else {
+        askForDecision(); // invalid choice, ask again
+      }
+    };
+
+    askForDecision();
   }
 })();
-
-// Get arguments
-const prefix = args.p;
-const suffix = args.s;
-const isLoggingEnabled = args.l;
-const threshold = args.w;
 
 const targets = [];
 
@@ -75,11 +93,11 @@ async function readTargets() {
 function checkNameMatch(sourceName, target) {
   const noDigitsName = sourceName.replace(/[0-9]+/g, '');
 
-  if (prefix && !noDigitsName.startsWith(prefix)) {
+  if (args.prefix && !noDigitsName.startsWith(args.prefix)) {
     return false;
   }
 
-  if (suffix && !noDigitsName.endsWith(suffix)) {
+  if (args.suffix && !noDigitsName.endsWith(args.suffix)) {
     return false;
   }
 
@@ -100,10 +118,10 @@ function compareTargetsWithSources(targets) {
         fs.copyFileSync('source_files/' + source_files[i], 'output_files/' + source_files[i]);
         matched.push(targets[j].raw);
 
-        if (isLoggingEnabled) {
-          const nameMatchPercentage = Math.round((targets[j].raw.length + suffix.length) / (source_files[i].length) * 100);
+        if (args.log) {
+          const nameMatchPercentage = Math.round((args.prefix.length + targets[j].raw.length + args.suffix.length) / (source_files[i].length) * 100);
 
-          if (nameMatchPercentage < threshold) {
+          if (nameMatchPercentage < args.threshold) {
             console.log('  \x1b[33m[' + nameMatchPercentage + '%]\x1b[0m MATCH - ' + source_files[i] + ' / ' + targets[j].raw);
           } else {
             console.log('  [' + nameMatchPercentage + '%] MATCH - ' + source_files[i] + ' / ' + targets[j].raw);
